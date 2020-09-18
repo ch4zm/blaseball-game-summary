@@ -304,7 +304,7 @@ class EventParser(object):
         inning = event['inning']
         top = event['top_of_inning']
         leadoff = event['is_leadoff']
-        if inning>9 and top and leadoff:
+        if inning>=9 and top and leadoff:
             # We just started an extra inning, so extend the line score
             self.line_score['home'] = self.line_score['home'] + [0]
             self.line_score['away'] = self.line_score['away'] + [0]
@@ -317,7 +317,7 @@ class EventParser(object):
                 label = 'home'
             # Increment runs in this inning by number of RBIs
             temp = self.line_score[label]
-            temp[inning-1] += event['runs_batted_in']
+            temp[inning] += event['runs_batted_in']
             self.line_score[label] = temp
 
     def parse_game_summary(self, event):
