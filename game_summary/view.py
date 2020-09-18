@@ -222,10 +222,34 @@ class TextView(BaseView):
                     team_summary.append("%s: %d"%(k, n))
             team_summary.append("")
 
-            # Batting summary
-            team_summary.append("Batting:")
-            for k in ['1B', '2B', '3B', 'HR', 'BB', 'K', 'SAC', 'GDP']:
-                bmap = summ['batting'][k]
+        # Batting summary
+        team_summary.append("Batting:")
+        for k in ['1B', '2B', '3B', 'HR', 'BB', 'K', 'SAC', 'GDP']:
+            bmap = summ['batting'][k]
+            if len(bmap.items())==0:
+                continue
+            # This string is the line to print for this stat
+            line = "%s: "%(k)
+            # Re-sort the map by value, highest to lowest
+            newbmap = {k: v for k, v in sorted(bmap.items(), reverse=True, key=lambda item: item[1])}
+            # Assemble BatterName (count) list
+            to_add = []
+            for player, value in newbmap.items():
+                if (k=='1B' or k=='K' or k=='BB') and value<2:
+                    continue
+                to_add.append("%s (%d)"%(player, value))
+            if len(to_add)>0:
+                # Make it pretty and print
+                line += ", ".join(to_add)
+                team_summary.append(line)
+        team_summary.append("LOB: %d"%(summ['batting']['LOB']))
+        team_summary.append("")
+
+        # Baserunning summary
+        if len(summ['baserunning']['CS'])>0 or len(summ['baserunning']['SB'])>0:
+            team_summary.append("Baserunning:")
+            for k in ['SB', 'CS']:
+                bmap = summ['baserunning'][k]
                 if len(bmap.items())==0:
                     continue
                 # This string is the line to print for this stat
@@ -235,36 +259,12 @@ class TextView(BaseView):
                 # Assemble BatterName (count) list
                 to_add = []
                 for player, value in newbmap.items():
-                    if (k=='1B' or k=='K' or k=='BB') and value<2:
-                        continue
                     to_add.append("%s (%d)"%(player, value))
                 if len(to_add)>0:
                     # Make it pretty and print
                     line += ", ".join(to_add)
                     team_summary.append(line)
-            team_summary.append("LOB: %d"%(summ['batting']['LOB']))
             team_summary.append("")
-
-            # Baserunning summary
-            if len(summ['baserunning']['CS'])>0 or len(summ['baserunning']['SB'])>0:
-                team_summary.append("Baserunning:")
-                for k in ['SB', 'CS']:
-                    bmap = summ['baserunning'][k]
-                    if len(bmap.items())==0:
-                        continue
-                    # This string is the line to print for this stat
-                    line = "%s: "%(k)
-                    # Re-sort the map by value, highest to lowest
-                    newbmap = {k: v for k, v in sorted(bmap.items(), reverse=True, key=lambda item: item[1])}
-                    # Assemble BatterName (count) list
-                    to_add = []
-                    for player, value in newbmap.items():
-                        to_add.append("%s (%d)"%(player, value))
-                    if len(to_add)>0:
-                        # Make it pretty and print
-                        line += ", ".join(to_add)
-                        team_summary.append(line)
-                team_summary.append("")
 
         return team_summary
 
