@@ -208,9 +208,9 @@ LP-BB: 0
 Team Summary: Sunbeams
 ----------------------
 Batting:
-1B: Alaynabella Hollywood (3)
-2B: Alexander Horne (1)
 HR: Igneus Delacruz (1), Alaynabella Hollywood (1), Randall Marijuana (1)
+2B: Alexander Horne (1)
+1B: Alaynabella Hollywood (3)
 K: Nagomi Nava (2)
 LOB: 6
 
@@ -221,10 +221,10 @@ CS: Igneus Delacruz (1)
 Team Summary: Wild Wings
 ------------------------
 Batting:
-1B: Ronan Combs (3), José Haley (2)
-2B: Cell Barajas (1)
-3B: Summers Preston (1)
 HR: Miguel Wheeler (1)
+3B: Summers Preston (1)
+2B: Cell Barajas (1)
+1B: Ronan Combs (3), José Haley (2)
 LOB: 6
 ```
 
@@ -274,9 +274,9 @@ Weather: Peanuts
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
 │                                                                           │
 │ Batting:                                                                  │
-│ 1B: Alaynabella Hollywood (3)                                             │
-│ 2B: Alexander Horne (1)                                                   │
 │ HR: Igneus Delacruz (1), Alaynabella Hollywood (1), Randall Marijuana (1) │
+│ 2B: Alexander Horne (1)                                                   │
+│ 1B: Alaynabella Hollywood (3)                                             │
 │ K: Nagomi Nava (2)                                                        │
 │ LOB: 6                                                                    │
 │                                                                           │
@@ -290,10 +290,10 @@ Weather: Peanuts
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
 │                                     │
 │ Batting:                            │
-│ 1B: Ronan Combs (3), José Haley (2) │
-│ 2B: Cell Barajas (1)                │
-│ 3B: Summers Preston (1)             │
 │ HR: Miguel Wheeler (1)              │
+│ 3B: Summers Preston (1)             │
+│ 2B: Cell Barajas (1)                │
+│ 1B: Ronan Combs (3), José Haley (2) │
 │ LOB: 6                              │
 │                                     │
 └─────────────────────────────────────┘
@@ -356,9 +356,9 @@ Weather: Solar Eclipse
 │ DP: 2                         │
 │                               │
 │ Batting:                      │
-│ 1B: Reese Clark (2)           │
-│ 3B: Comfort Septemberish (1)  │
 │ HR: Fitzgerald Blackburn (1)  │
+│ 3B: Comfort Septemberish (1)  │
+│ 1B: Reese Clark (2)           │
 │ BB: Marco Escobar (2)         │
 │ SAC: Fitzgerald Blackburn (1) │
 │ LOB: 4                        │
