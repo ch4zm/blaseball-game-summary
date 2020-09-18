@@ -15,7 +15,7 @@ to make the game summary tables.
 
 ## Table of Contents
 
-* [Screenshots](#screenshots)
+* [Example Output](#example-output)
 * [Installation](#installation)
     * [pip](#pip)
     * [source](#source)
@@ -25,45 +25,371 @@ to make the game summary tables.
 * [Future work](#future-work)
 * [Libraries used](#libraries-used)
 
-## Screenshots
+## Example Output
 
-The `streak-finder` tool can print plain text tables to the console,
-or output tables in HTML or Markdown format. Here are a few examples:
+The `game-summary` tool can print summary tables of a game in multiple formats. Here are some examples.
 
-Look for winning streaks from the Tigers from Season 3 and 4,
+We start by using the [`game-finder`](https://github.com/ch4zm/blaseball-game-finder) tool
+to find a particular game's game ID.
 
-![Winning streaks for Tigers Seasons 3 and 4](https://github.com/ch4zm/blaseball-streak-finder/raw/master/img/s34tigers.png)
+Let's start with Season 4 Game 20. On this day the Sunbeams were at the Wild Wings, and Randy Marijuana
+hit a dramatic two-run home run in the tenth inning for the Sunbeams, who went on to win the game. 
 
-Compare to winning streaks by the Pies at the same:
+```
+$ game-finder --season 4 --day 20 --team Sunbeams
+25af923d-eab6-4dbf-9509-87376d9c6d0d
+```
 
-![Winning streaks for Tigers and Pies Seasons 3 and 4](https://github.com/ch4zm/blaseball-streak-finder/raw/master/img/s34tigerspies.png)
+If we pass this to `game-summary`, we get the JSON version of the game summary, which is what the other
+formats use under the hood:
 
-Show the top winning streaks in Season 1 for the Good League:
+```
+$ game-finder --season 4 --day 20 --team Sunbeams | xargs game-summary
+{
+    "info": {
+        "season": 4,
+        "day": 20,
+        "homeTeamNickname": "Wild Wings",
+        "awayTeamNickname": "Sunbeams",
+        "homeTeamName": "Mexico City Wild Wings",
+        "awayTeamName": "Hellmouth Sunbeams",
+        "stadium": "The Bucket, Mexico City",
+        "weather": "Peanuts"
+    },
+    "box_score": {
+        "home": [ 4, 9, 0 ],
+        "away": [ 6, 12, 0 ]
+    },
+    "line_score": {
+        "home": [ 0, 1, 0, 3, 0, 0, 0, 0, 0 ],
+        "away": [ 0, 0, 0, 1, 3, 0, 0, 0, 2 ] },
+    "pitching_summary": {
+        "WP-K": 3,
+        "WP-BB": 1,
+        "WP-HBP": 0,
+        "LP-K": 8,
+        "LP-BB": 0,
+        "LP-HBP": 0,
+        "WP": "Miguel James",
+        "LP": "Silvia Rugrat"
+    },
+    "game_summary": {
+        "home": {
+            "fielding": {
+                "DP": 0,
+                "TP": 0
+            },
+            "batting": {
+                "1B": {
+                    "Jos\u00e9 Haley": 2,
+                    "Yong Wright": 1,
+                    "Ronan Combs": 3
+                },
+                "2B": {
+                    "Cell Barajas": 1
+                },
+                "3B": {
+                    "Summers Preston": 1
+                },
+                "HR": {
+                    "Miguel Wheeler": 1
+                },
+                "K": {
+                    "Summers Preston": 1,
+                    "Sosa Hayes": 1,
+                    "Cell Barajas": 1
+                },
+                "BB": {
+                    "Axel Cardenas": 1
+                },
+                "SAC": {},
+                "GDP": {},
+                "GTP": {},
+                "LOB": 6
+            },
+            "baserunning": {
+                "SB": {},
+                "CS": {}
+            }
+        },
+        "away": {
+            "fielding": {
+                "DP": 0,
+                "TP": 0
+            },
+            "batting": {
+                "1B": {
+                    "Alaynabella Hollywood": 3,
+                    "Alexander Horne": 1,
+                    "Malik Romayne": 1,
+                    "Emmett Internet": 1,
+                    "Dudley Mueller": 1,
+                    "Nerd Pacheco": 1
+                },
+                "2B": {
+                    "Alexander Horne": 1
+                },
+                "3B": {},
+                "HR": {
+                    "Igneus Delacruz": 1,
+                    "Alaynabella Hollywood": 1,
+                    "Randall Marijuana": 1
+                },
+                "K": {
+                    "Malik Romayne": 1,
+                    "Nagomi Nava": 2,
+                    "Nerd Pacheco": 1,
+                    "Dudley Mueller": 1,
+                    "Randall Marijuana": 1,
+                    "Emmett Internet": 1,
+                    "Alexander Horne": 1
+                },
+                "BB": {},
+                "SAC": {},
+                "GDP": {},
+                "GTP": {},
+                "LOB": 6
+            },
+            "baserunning": {
+                "SB": {},
+                "CS": {
+                    "Igneus Delacruz": 1
+                }
+            }
+        }
+    },
+    "weather_events": []
+}
+```
 
-![Winning streaks for Good League Season 1](https://github.com/ch4zm/blaseball-streak-finder/raw/master/img/goodleaguestreaks.png)
+Now the text version of the same game:
 
-Compare to top winning streaks in Season 1 for the Evil League:
+```
+$ game-finder --season 4 --day 20 --team Sunbeams | xargs game-summary --text
 
-![Winning streaks for Evil League Season 1](https://github.com/ch4zm/blaseball-streak-finder/raw/master/img/evilleaguestreaks.png)
+Game ID: 25af923d-eab6-4dbf-9509-87376d9c6d0d
+Season 4 Day 20:
+Hellmouth Sunbeams @ Mexico City Wild Wings
+The Bucket, Mexico City
+Weather: Peanuts
 
-Show game-by-game summaries of the worst losing streaks in blaseball history:
 
-![Worst losing streaks](https://github.com/ch4zm/blaseball-streak-finder/raw/master/img/worstdetailsnew.png)
+------------------------------------------
+|                      |  R  |  H  |  E  |
+------------------------------------------
+| Sunbeams             |   6 |  12 |   0 |
+------------------------------------------
+| Wild Wings           |   4 |   9 |   0 |
+------------------------------------------
 
-This tool also works on antique hardware!
 
-![Worst losing streaks antique hardware](https://github.com/ch4zm/blaseball-streak-finder/raw/master/img/worstdetailsold.png)
+------------------------------------------------------------------------------------------------------
+|                      |   1 |   2 |   3 |   4 |   5 |   6 |   7 |   8 |   9 |     |  R  |  H  |  E  |
+------------------------------------------------------------------------------------------------------
+| Sunbeams             |   0 |   0 |   0 |   1 |   3 |   0 |   0 |   0 |   2 |     |   6 |  12 |   0 |
+------------------------------------------------------------------------------------------------------
+| Wild Wings           |   0 |   1 |   0 |   3 |   0 |   0 |   0 |   0 |   0 |     |   4 |   9 |   0 |
+------------------------------------------------------------------------------------------------------
 
-The tool also offers the ability to export tables in HTML format,
-in both short and long versions:
 
-![HTML short command](https://github.com/ch4zm/blaseball-streak-finder/raw/master/img/htmlshort.png)
 
-![HTML short page](https://github.com/ch4zm/blaseball-streak-finder/raw/master/img/htmlshortpage.png)
+Pitching Summary:
+-----------------
 
-![HTML long command](https://github.com/ch4zm/blaseball-streak-finder/raw/master/img/htmllong.png)
+WP: Miguel James
+WP-K: 3
+WP-BB: 1
+LP: Silvia Rugrat
+LP-K: 8
+LP-BB: 0
 
-![HTML long page](https://github.com/ch4zm/blaseball-streak-finder/raw/master/img/htmllongpage.png)
+
+
+Team Summary: Sunbeams
+----------------------
+Batting:
+1B: Alaynabella Hollywood (3)
+2B: Alexander Horne (1)
+HR: Igneus Delacruz (1), Alaynabella Hollywood (1), Randall Marijuana (1)
+K: Nagomi Nava (2)
+LOB: 6
+
+Baserunning:
+CS: Igneus Delacruz (1)
+
+
+Team Summary: Wild Wings
+------------------------
+Batting:
+1B: Ronan Combs (3), José Haley (2)
+2B: Cell Barajas (1)
+3B: Summers Preston (1)
+HR: Miguel Wheeler (1)
+LOB: 6
+```
+
+Likewise here is the rich text view:
+
+```
+$ game-finder --season 4 --day 20 --team Sunbeams | xargs game-summary --rich
+
+Game ID: 25af923d-eab6-4dbf-9509-87376d9c6d0d
+Season 4 Day 20:
+Hellmouth Sunbeams @ Mexico City Wild Wings
+The Bucket, Mexico City
+Weather: Peanuts
+
+
+┏━━━━━━━━━━━━┳━━━┳━━━━┳━━━┓
+┃            ┃ R ┃ H  ┃ E ┃
+┡━━━━━━━━━━━━╇━━━╇━━━━╇━━━┩
+│ Sunbeams   │ 6 │ 12 │ 0 │
+│ Wild Wings │ 4 │ 9  │ 0 │
+└────────────┴───┴────┴───┘
+
+
+┏━━━━━━━━━━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━━┳━━━┓
+┃            ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃   ┃ R ┃ H  ┃ E ┃
+┡━━━━━━━━━━━━╇━━━╇━━━╇━━━╇━━━╇━━━╇━━━╇━━━╇━━━╇━━━╇━━━╇━━━╇━━━━╇━━━┩
+│ Sunbeams   │ 0 │ 0 │ 0 │ 1 │ 3 │ 0 │ 0 │ 0 │ 2 │   │ 6 │ 12 │ 0 │
+│ Wild Wings │ 0 │ 1 │ 0 │ 3 │ 0 │ 0 │ 0 │ 0 │ 0 │   │ 4 │ 9  │ 0 │
+└────────────┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴────┴───┘
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Pitching Summary:             ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ Winning Pitcher: Miguel James │
+│ K: 3                          │
+│ BB: 1                         │
+│ Losing Pitcher: Silvia Rugrat │
+│ K: 8                          │
+│ BB: 0                         │
+│                               │
+└───────────────────────────────┘
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Team Summary: Sunbeams                                                    ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│                                                                           │
+│ Batting:                                                                  │
+│ 1B: Alaynabella Hollywood (3)                                             │
+│ 2B: Alexander Horne (1)                                                   │
+│ HR: Igneus Delacruz (1), Alaynabella Hollywood (1), Randall Marijuana (1) │
+│ K: Nagomi Nava (2)                                                        │
+│ LOB: 6                                                                    │
+│                                                                           │
+│ Baserunning:                                                              │
+│ CS: Igneus Delacruz (1)                                                   │
+│                                                                           │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Team Summary: Wild Wings            ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│                                     │
+│ Batting:                            │
+│ 1B: Ronan Combs (3), José Haley (2) │
+│ 2B: Cell Barajas (1)                │
+│ 3B: Summers Preston (1)             │
+│ HR: Miguel Wheeler (1)              │
+│ LOB: 6                              │
+│                                     │
+└─────────────────────────────────────┘
+
+```
+
+If there are weather events, there is a weather events box printed at the bottom. Here is the
+Season 6 Day 84 Jazz Hands game against the Spies where Randall Marijuana was incinerated:
+
+```
+$ game-finder --season 6 --day 84 --team "Jazz Hands"
+c8eb9f92-5f9e-444f-9ad4-e679a58a10bd
+```
+
+When we show the game summary, weather events (in this case, incineration) are collected at the bottom:
+
+```
+$ game-finder --season 6 --day 84 --team "Jazz Hands" | xargs game-summary --rich
+
+Game ID: c8eb9f92-5f9e-444f-9ad4-e679a58a10bd
+Season 6 Day 84:
+Houston Spies @ Breckenridge Jazz Hands
+The Pocket, Breckenridge
+Weather: Solar Eclipse
+
+
+┏━━━━━━━━━━━━┳━━━┳━━━┳━━━┓
+┃            ┃ R ┃ H ┃ E ┃
+┡━━━━━━━━━━━━╇━━━╇━━━╇━━━┩
+│ Spies      │ 3 │ 6 │ 0 │
+│ Jazz Hands │ 2 │ 7 │ 0 │
+└────────────┴───┴───┴───┘
+
+
+┏━━━━━━━━━━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┓
+┃            ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃   ┃ R ┃ H ┃ E ┃
+┡━━━━━━━━━━━━╇━━━╇━━━╇━━━╇━━━╇━━━╇━━━╇━━━╇━━━╇━━━╇━━━╇━━━╇━━━╇━━━┩
+│ Spies      │ 0 │ 0 │ 0 │ 1 │ 0 │ 0 │ 0 │ 0 │ 2 │   │ 3 │ 6 │ 0 │
+│ Jazz Hands │ 2 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │   │ 2 │ 7 │ 0 │
+└────────────┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Pitching Summary:               ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ Winning Pitcher: Math Velazquez │
+│ K: 2                            │
+│ BB: 3                           │
+│ Losing Pitcher: Agan Harrison   │
+│ K: 1                            │
+│ BB: 4                           │
+│                                 │
+└─────────────────────────────────┘
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Team Summary: Spies           ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ Fielding:                     │
+│ DP: 2                         │
+│                               │
+│ Batting:                      │
+│ 1B: Reese Clark (2)           │
+│ 3B: Comfort Septemberish (1)  │
+│ HR: Fitzgerald Blackburn (1)  │
+│ BB: Marco Escobar (2)         │
+│ SAC: Fitzgerald Blackburn (1) │
+│ LOB: 4                        │
+│                               │
+│ Baserunning:                  │
+│ CS: Howell Franklin (1)       │
+│                               │
+└───────────────────────────────┘
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Team Summary: Jazz Hands                        ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│                                                 │
+│ Batting:                                        │
+│ HR: Kathy Mathews (1)                           │
+│ BB: Aldon Cashmoney (2)                         │
+│ GDP: Stephens Lightner (1), Nagomi Mcdaniel (1) │
+│ LOB: 6                                          │
+│                                                 │
+└─────────────────────────────────────────────────┘
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Weather Events:                                                              ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ Rogue Umpire incinerated Jazz Hands hitter Randall Marijuana! Replaced by    │
+│ Steph Weeks                                                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+```
+
 
 ## Installation
 
