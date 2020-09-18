@@ -13,10 +13,6 @@ console, and `--json` to dump a JSON object containing the info used
 to make the game summary tables.
 
 
-########################################################################
-########################### i stopped here lmao ########################
-########################################################################
-
 ## Table of Contents
 
 * [Screenshots](#screenshots)
@@ -25,15 +21,9 @@ to make the game summary tables.
     * [source](#source)
 * [Quick Start](#quick-start)
     * [Command line flags](#command-line-flags)
-    * [Configuration file](#configuration-file)
 * [Data](#data)
-* [Configuration Examples](#configuration-examples)
-* [Scripts](#scripts)
-* [Software architecture](#software-architecture)
-* [Who is this tool for?](#who-is-this-tool-for)
 * [Future work](#future-work)
-    * [Libraries used](#libraries-used)
-
+* [Libraries used](#libraries-used)
 
 ## Screenshots
 
@@ -80,7 +70,7 @@ in both short and long versions:
 ### pip
 
 ```
-pip install blaseball-streak-finder
+pip install blaseball-game-summary
 ```
 
 ### source
@@ -88,8 +78,8 @@ pip install blaseball-streak-finder
 Start by cloning the package:
 
 ```
-git clone https://github.com/ch4zm/blaseball-streak-finder
-cd blaseball-streak-finder
+git clone https://github.com/ch4zm/blaseball-game-summary
+cd blaseball-game-summary
 ```
 
 If installing from source, it is recommended you install the package
@@ -111,234 +101,68 @@ Now test that the tool is available on the command line, and try out
 a command to search for some streaks:
 
 ```
-which streak-finder
-streak-finder --min 8 --short
+which game-summary
+game-summary c8eb9f92-5f9e-444f-9ad4-e679a58a10bd
 ```
+
+(this was the game that Randy Marijuana was incinerated from the Jazz Hands.)
 
 ## Quick Start
 
-The way this tool works is, it creates a data frame object, applies some filters to it based on command line flags provided
-by the user, then runs the data frame through a data viewer (which makes the nice tables). All command line flags can also 
-be specified in a config file.
+This tool is calling the `/events` API endpoint of the blaseball-reference.com
+API, which returns a list of all events in a given game, and parsing through
+each event to keep track of the box score, line score, pitching, batting, etc.
+
+The tool stores the final game summary information in a JSON structure,
+and each different output option (markdown, rich console text, or plain text)
+utilizes the common JSON data structure.
 
 ### Command line flags
 
 Command line flags are grouped into data options and view options.
 
-Data options:
+Basic options:
 
-* **Winning or Losing Streaks**: Use the `--winning`/`--losing` flags to specify winning/losing streaks
+* **Print version:** `--version` or `-v` flag
 
-* **Season**: Set season for game data using `--season`. For multiple seasons, repeat the flag: `--season 1 --season 2`
+Positional arguments:
 
-* (Optional) **Our Team**: Specify only one of the following:
-    * **Team**: use the `--team` flag to specify the short name of your team (use `--help` to see
-      valid choices). For multiple teams, use multiple `--team` flags.
-    * **Division**: use the `--division` flag to specify the name of a division. Surround division
-      name in quotes, e.g., `--division "Lawful Evil"`
-    * **League**: use the `--league` flag to specify the Good/Evil league
-
-* (Optional) **Versus Team**: Specify only one of the following:
-    * **Versus Team**: use the `--versus-team` flag to specify the short name of the opposing team (use `--help` to see
-      valid choices). For multiple teams, use multiple `--versus-team` flags.
-    * **Versus Division**: use the `--versus-division` flag to specify the name of the versus division. Surround division
-      name in quotes, e.g., `--versus-division "Lawful Evil"`
-    * **Versus League**: use the `--versus-league` flag to specify the versus Good/Evil league
-
-(If neither flag is specified, it will include all games between all teams.)
+* **Game ID:** this is the first positional (non-flag) argument. Its value should be the UUID of a game.
 
 View options:
 
-* **Minimum**: Specify the minimum number of wins or losses to qualify as a streak with `--min N`
+* **Text:** Use the `--text` flag to output game summaries in plain text format
 
-* **HTML**: Use `--html` to specify that the output should be in HTML table format.
-  If no `--output` file is specified, it will print the HTML to stdout.
+* **Rich:** Use the `--rich` flag to output game summaries in rich text format
 
-* **Markdown**: Use `--markdown` to specify that the output should be in Markdown table format.
-  If no `--output` file is specified, it will print the Markdown to stdout.
+* **Markdown:** Use the `--markdown` flag to output game summaries in Markdown format
 
-* **Output File**: Use `--output` to specify the output file when using the `--html` or `--markdown` flags.
-  This flag has no effect when `--html` or `--markdown` are not present.
+* **JSON:** (default) Use the `--json` flag to output game summaries in JSON format
 
-* **Use Short Output**: Use `--short` to display streaks in short format
-  (one line per streak; default option).
-
-* **Use Long Output**: Use `--long` to display streaks in long format
-  (one table per streak summarizing each game in the streak).
-
-* **Use Nicknames**: Use `--nickname` flag to use team nicknames in table (e.g., Sunbeams)
-
-* **Use Full Names**: Use `--fullname` flag to use full team name in table (e.g., Hellmouth Sunbeams)
+* **Box or Line Socre Only:** Add the `--box-only` flag to print the box score only
+  (3-column table with Runs, Hits, and Errors); add the `--line-only` flag to print
+  the line score only (multi-column table with one column per inning, plus the tally
+  of Runs, Hits, and Errors at the end)
 
 Using a configuration file:
 
 * **Config file**: use the `-c` or `--config` file to point to a configuration file (see next section).
 
 
-### Configuration file
-
-(Note: several configuration file examples are provided in a section below.)
-
-Every command line flag can be specified in a configuration file as well.
-To reproduce the following command line call,
-
-```
-streak-finder --season 1 --season 2 --team Tigers --versus-team Pies --min 5 --fullname 
-```
-
-we could create a configuration file named `config.ini` with the contents:
-
-```
-season = [1, 2]
-team = Tigers
-versus-team = Pies
-min = 5
-fullname = True
-```
-
-and run `blaseball-streak-finder` specifying that configuration file:
-
-```
-streak-finder --config config.ini
-# or
-streak-finder -c config.ini
-```
-
-This would produce identical output to the command with all the flags.
-
-You can also use both a config file and command line flags; the command line flags will take
-precedence over config file options if a parameter is specified by both.
-
-
 ## Data
 
-The data set used by this tool comes from `blaseball.com`'s `/games` API endpoint.
-The data set is imported from [`blaseball-core-game-data`](https://githib.com/ch4zm/blaseball-core-game-data).
-
-
-## Configuration Examples
-
-See [`config.example.ini`](https://github.com/ch4zm/blaseball-streak-finder/tree/master/config.example.ini)
-in the repo for an example config file.
-
-Show winning streaks from season 3 and season 4 for the Hades Tigers:
-
-```
-[data]
-season = [3, 4]
-team = Tigers
-winning
-min = 5
-```
-
-Include winning streaks by the Pies too:
-
-```
-[data]
-season = [3, 4]
-team = [Tigers, Pies]
-winning
-min = 5
-```
-
-Show the top winning streaks from season 1 for all teams in the Good League:
-
-```
-[data]
-season = 1
-league = Good
-winning
-min = 7
-```
-
-Compare to top winning streaks from season 1 for all teams in the Evil League:
-
-```
-[data]
-season = 1
-league = Evil
-winning
-min = 7
-```
-
-Look for losing streaks that were 12 games or more, and print a game-by-game
-summary of the streaks using the long format:
-
-```
-[data]
-min = 12
-losing
-long
-```
-
-Look for winning streaks by the Firefighters that were 7 games or more, and output
-the summary table to the file `short.html`:
-
-```
-[data]
-team = Firefighters
-min = 7
-winning
-short
-html
-output = short.html
-```
-
-Repeat the above streak-finding search, but output a table for each streak
-with a game-by-game breakdown (long format) to the file `long.html`:
-
-```
-[data]
-team = Firefighters
-min = 7
-winning
-long
-html
-output = long.html
-```
-
-Repeat the above streak-finding search, but output a Markdown table for each streak
-with a game-by-game breakdown (long format) to the file `long.md`:
-
-```
-[data]
-team = Firefighters
-min = 7
-winning
-long
-markdown
-output = long.md
-```
-
-## Software architecture
-
-This software consists of three parts:
-
-* The command line flag and config file parser (uses `configargparse` library) - see `cli/command.py`
-* The StreakData object that stores the game data in a Pandas data frame (uses `pandas` library) - see
-  `cli/streak_data.py`
-* The View object that provides a presentation layer on top of the Pandas data frame
-  (uses panda's `DataFrame.to_string()` and `DataFrame.to_html()` methods to print the data) - see
-  `cli/view.py` (there are two classes, one for plain text and one for HTML)
-
-
-## Who is this tool for?
-
-This tool is for the blaseball community. It will be useful to people
-interested in exploring game data, people who are brainstorming about
-lore for their team, and people who are looking for a starting point
-for developing their own blaseball tool.
+The data set used by this tool comes from `blaseball-reference.com`'s `/events` API endpoint.
 
 
 ## Future work
 
-* Add pitcher filter
+* Writing other scripts that wrap this script, to store events
+  for a given team over a given season, and analyze various
 
 
 ## Libraries used
 
 This command line tool uses the following libraries under the hood:
 
-* [blaseball-core-game-data](https://github.com/ch4zm/blaseball-core-game-data)
-* [pandas](https://pandas.pydata.org/) for organizing/filtering data
 * [configarparse](https://github.com/bw2/ConfigArgParse) for handling CLI arguments
+* [requests](https://requests.readthedocs.io/en/master/) for making API request
