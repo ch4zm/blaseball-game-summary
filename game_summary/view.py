@@ -224,7 +224,7 @@ class TextView(BaseView):
 
         # Batting summary
         team_summary.append("Batting:")
-        for k in ['1B', '2B', '3B', 'HR', 'BB', 'K', 'SAC', 'GDP']:
+        for k in ['HR', '3B', '2B', '1B', 'BB', 'K', 'SAC', 'GDP']:
             bmap = summ['batting'][k]
             if len(bmap.items())==0:
                 continue
@@ -422,7 +422,7 @@ class RichView(TextView):
         table.add_row("[bold]Batting:[/bold]")
 
         batting_summary = []
-        for k in ['1B', '2B', '3B', 'HR', 'BB', 'K', 'SAC', 'GDP']:
+        for k in ['HR', '3B', '2B', '1B', 'BB', 'K', 'SAC', 'GDP']:
             bmap = summ['batting'][k]
             if len(bmap.items())==0:
                 continue
@@ -649,7 +649,7 @@ class MarkdownView(TextView):
         team_summary.append("| **Batting:** |")
 
         batting_summary = []
-        for k in ['1B', '2B', '3B', 'HR', 'BB', 'K', 'SAC', 'GDP']:
+        for k in ['HR', '3B', '2B', '1B', 'BB', 'K', 'SAC', 'GDP']:
             bmap = summ['batting'][k]
             if len(bmap.items())==0:
                 continue
