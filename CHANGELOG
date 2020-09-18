@@ -1,6 +1,10 @@
+# v0.4
+
+* fix bug in inning indexing
+
 # v0.2
 
-* fix error in team summary printing in --text mode
+* fix bug in team summary printing in --text mode
 
 # v0.1
 
