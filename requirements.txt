@@ -1,0 +1,4 @@
+blaseball-core-game-data
+requests
+configargparse
+rich
