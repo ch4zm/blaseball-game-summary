@@ -478,6 +478,12 @@ Using a configuration file:
 ## Data
 
 The data set used by this tool comes from `blaseball-reference.com`'s `/events` API endpoint.
+The events endpoint returns an array of JSON objects, each one representing an at-bat in a
+blaseball game. This program parses each event and extracts relevant information, accumulating
+game summary information into a final JSON structure (see top of Readme for JSON structure).
+
+The user can output the raw JSON (making game-summary a useful component in an analysis pipeline)
+or it can format the JSON for viewing, in text, rich text, or markdown format.
 
 
 ## Future work
@@ -492,3 +498,4 @@ This command line tool uses the following libraries under the hood:
 
 * [configarparse](https://github.com/bw2/ConfigArgParse) for handling CLI arguments
 * [requests](https://requests.readthedocs.io/en/master/) for making API request
+* [rich](https://github.com/willmcgugan/rich) for displaying rich text in the console
