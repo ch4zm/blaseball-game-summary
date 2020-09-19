@@ -1,3 +1,7 @@
+# v0.5
+
+* adding additional logic to handle events that are RBIs but not labeled as such
+
 # v0.4
 
 * fix bug in inning indexing
