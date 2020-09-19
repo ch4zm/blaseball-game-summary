@@ -45,6 +45,7 @@ gameSummary:
   - GDP
     - player_name: count
   - LOB: int
+  - RBI: int
 - baserunning:
   - SB
     - player_name: count
@@ -194,7 +195,8 @@ class EventParser(object):
                     'SAC': {},
                     'GDP': {},
                     'GTP': {},
-                    'LOB': 0
+                    'LOB': 0,
+                    'RBI': 0
                 },
                 'baserunning': {
                     'SB': {},
@@ -268,14 +270,20 @@ class EventParser(object):
 
     def parse_box_score(self, event):
         # Check for runs
-        if event['runs_batted_in'] > 0:
+        rbi = False
+        for event_text in event['event_text']:
+            if 'score' in event_text.lower():
+                rbi = True
+        rbi = rbi or event['runs_batted_in'] > 0
+        if rbi > 0:
             if event['top_of_inning']:
                 label = 'away'
             else:
                 label = 'home'
             # Increment runs by number of RBIs
+            # (Note, this is simplistic and may count e.g. people walked home as a "run batted in")
             temp = self.box_score[label]
-            temp[0] += event['runs_batted_in']
+            temp[0] += max(1, event['runs_batted_in'])
             self.box_score[label] = temp
 
         # Check for hits
@@ -310,14 +318,19 @@ class EventParser(object):
             self.line_score['away'] = self.line_score['away'] + [0]
 
         # Update line score with new runs
-        if event['runs_batted_in'] > 0:
+        rbi = False
+        for event_text in event['event_text']:
+            if 'score' in event_text.lower():
+                rbi = True
+        rbi = rbi or event['runs_batted_in'] > 0
+        if rbi:
             if event['top_of_inning']:
                 label = 'away'
             else:
                 label = 'home'
             # Increment runs in this inning by number of RBIs
             temp = self.line_score[label]
-            temp[inning] += event['runs_batted_in']
+            temp[inning] += max(1, event['runs_batted_in'])
             self.line_score[label] = temp
 
     def parse_game_summary(self, event):
@@ -397,6 +410,16 @@ class EventParser(object):
             self.game_summary[label][catkey]['LOB'] += self.n_baserunners
             # n_baserunners will be reset at the top of the inning,
             # don't reset here b/c later methods will use it
+
+        # Accumulate RBIs
+        rbi = False
+        for event_text in event['event_text']:
+            if 'score' in event_text.lower():
+                rbi = True
+        rbi = rbi or event['runs_batted_in'] > 0
+        if rbi:
+            self.game_summary[label][catkey]['RBI'] += max(1, event['runs_batted_in'])
+
 
     def parse_game_summary_baserunning(self, event):
         catkey = 'baserunning'
