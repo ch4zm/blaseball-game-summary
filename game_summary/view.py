@@ -520,8 +520,8 @@ class MarkdownView(TextView):
         # ---------------
         # team summaries
         if not self.box_only and not self.line_only:
-            print("")
             for who in ['away', 'home']:
+                print("")
                 print("\n".join(self.md_team_summary(who)))
                 print("")
 
