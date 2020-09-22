@@ -8,6 +8,12 @@ data_path = os.path.abspath(os.path.join(root_path, 'data'))
 SHORT2LONG_JSON = os.path.join(data_path, "short2long.json")
 STADIUMS_JSON = os.path.join(data_path, "stadiums.json")
 
+DALE_SAFE = "Dale" # for command line
+DALE_UTF8 = "Dal\u00e9" # for display
+
+FULL_DALE_SAFE = "Miami Dale" # for command line
+FULL_DALE_UTF8 = "Miami Dal\u00e9" # for display
+
 
 class TieGameException(Exception):
     pass
@@ -19,6 +25,7 @@ class GameParsingError(Exception):
 
 def get_stadium(team_name):
     """Given a team name (long or short), get the name of the stadium"""
+    team_name = sanitize_dale(team_name)
     result = None
     stadiums = get_stadiums()
     
@@ -57,3 +64,23 @@ def get_short2long():
     else:
         raise FileNotFoundError("Missing team nickname to full name data file: %s"%(SHORT2LONG_JSON))
     return short2long
+
+
+def desanitize_dale(s):
+    """Utility function to change sanitized Dale back to unicode"""
+    if s == DALE_SAFE:
+        return DALE_UTF8
+    elif s == FULL_DALE_SAFE:
+        return FULL_DALE_UTF8
+    else:
+        return s
+
+
+def sanitize_dale(s):
+    """Utility function to make CLI flag value easier to set"""
+    if s == DALE_UTF8:
+        return DALE_SAFE
+    elif s== FULL_DALE_UTF8:
+        return FULL_DALE_SAFE
+    else:
+        return s
