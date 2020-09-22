@@ -351,7 +351,6 @@ class EventParser(object):
                 label = 'home'
             # Increment runs in this inning by number of RBIs
             temp = self.line_score[label]
-            print(inning)
             temp[inning] += max(1, event['runs_batted_in'])
             self.line_score[label] = temp
 

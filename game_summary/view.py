@@ -2,7 +2,7 @@ import sys
 import json
 from rich.console import Console
 from rich.table import Table
-from .util import TieGameException
+from .util import TieGameException, GameParsingError
 from .data_model import GameSummaryData
 from .data_raw import NoMatchingGames, ApiError
 

@@ -25,7 +25,7 @@ def get_stadium(team_name):
     if team_name in stadiums.keys():
         # Easy case: we got a short name
         result = stadiums[team_name]
-    elif team_name in stadium.values():
+    elif team_name in stadiums.values():
         # Hard case: we were given a long name,
         # so get corresponding short name
         for k, v in stadium.items():
