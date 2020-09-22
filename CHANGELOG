@@ -1,6 +1,7 @@
 # v0.5
 
 * adding additional logic to handle events that are RBIs but not labeled as such
+* fixing inning leadoff events that are missing the leadoff flag
 
 # v0.4
 
