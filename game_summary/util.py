@@ -13,6 +13,10 @@ class TieGameException(Exception):
     pass
 
 
+class GameParsingError(Exception):
+    pass
+
+
 def get_stadium(team_name):
     """Given a team name (long or short), get the name of the stadium"""
     result = None

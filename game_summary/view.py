@@ -45,6 +45,9 @@ class BaseView(object):
         except TieGameException as e:
             print(f"Error with game id {self.game_id}, that game ended in a tie")
             sys.exit(0)
+        except GameParsingError as e:
+            print(f"Error parsing events of game id {self.game_id}, use blaseball-game-dump to check the event log for errors")
+            sys.exit(1)
 
 class JsonView(BaseView):
     """

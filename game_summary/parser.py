@@ -1,7 +1,7 @@
 import re
 import json
 from .data_raw import EntityData
-from .util import get_stadium, TieGameException
+from .util import get_stadium, TieGameException, GameParsingError
 
 
 """
@@ -110,6 +110,9 @@ class EventParser(object):
         self.init_line_score()
         self.init_game_summary()
         self.init_weather_events()
+
+        # Have we seen any events in this half-inning yet
+        self.not_leadoff = [[False,]*9, [False]*9]
 
     def get_json(self):
         """Return the final game summary JSON"""
@@ -311,11 +314,29 @@ class EventParser(object):
         # Update line score with new column if extra innings
         inning = event['inning']
         top = event['top_of_inning']
+        top_ix = 0 if top else 1
         leadoff = event['is_leadoff']
+
+        # Can't trust the leadoff boolean... Some games are off
+        try:
+            if self.not_leadoff[top_ix][inning] is False:
+                leadoff = True
+                self.not_leadoff[top_ix][inning] = True
+        except IndexError:
+            # This is an extra-inning leadoff
+            leadoff = True
+            self.not_leadoff[top_ix] += [True]
+
         if inning>=9 and top and leadoff:
             # We just started an extra inning, so extend the line score
             self.line_score['home'] = self.line_score['home'] + [0]
             self.line_score['away'] = self.line_score['away'] + [0]
+
+        # Update leadoff
+        try:
+            self.not_leadoff[top_ix][inning] = True
+        except IndexError:
+            raise GameParsingError()
 
         # Update line score with new runs
         rbi = False
@@ -330,6 +351,7 @@ class EventParser(object):
                 label = 'home'
             # Increment runs in this inning by number of RBIs
             temp = self.line_score[label]
+            print(inning)
             temp[inning] += max(1, event['runs_batted_in'])
             self.line_score[label] = temp
 
