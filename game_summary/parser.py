@@ -28,6 +28,7 @@ gameSummary:
   - DP: int
   - TP: int
 - batting:
+  - H: [0, 0, 0, 0, 0, 0, 0, 0, 0]
   - 1B:
     - player_name: count
   - 2B:
@@ -53,11 +54,11 @@ gameSummary:
     - player_name: count
 - pitching
   - WP: _
-  - WP-K: _
-  - WP-BB: _
+  - WP-K: [0, 0, 0, 0, 0, 0, 0, 0, 0]
+  - WP-BB: [0, 0, 0, 0, 0, 0, 0, 0, 0]
   - LP: _
-  - LP-K: _
-  - LP-BB: _
+  - LP-K: [0, 0, 0, 0, 0, 0, 0, 0, 0]
+  - LP-BB: [0, 0, 0, 0, 0, 0, 0, 0, 0]
 - weatherEvents:
   - "X was incinerated"
   - "The blooddrain gurgled"
@@ -113,6 +114,8 @@ class EventParser(object):
 
         # Have we seen any events in this half-inning yet
         self.not_leadoff = [[False,]*9, [False]*9]
+        # Keep track of whether this is the inning leadoff batter
+        self.leadoff = False
 
     def get_json(self):
         """Return the final game summary JSON"""
@@ -206,9 +209,9 @@ class EventParser(object):
                     'CS': {}
                 },
                 'pitching': {
-                    'K': 0,
-                    'BB': 0,
-                    'HBP': 0,
+                    'K': [0,]*9,
+                    'BB': [0,]*9,
+                    'HBP': [0,]*9,
                 }
             }
 
@@ -216,6 +219,7 @@ class EventParser(object):
         self.weather_events = []
 
     def parse(self, event):
+        self.update_leadoff(event)
         self.update_runner_count(event)
         self.parse_box_score(event)
         self.parse_line_score(event)
@@ -260,9 +264,31 @@ class EventParser(object):
         else:
             raise TieGameException()
 
+    def update_leadoff(self, event):
+        self.leadoff = event['is_leadoff']
+        inning = event['inning']
+        top = event['top_of_inning']
+        top_ix = 0 if top else 1
+
+        # Can't trust the leadoff boolean... Some games are off
+        try:
+            if self.not_leadoff[top_ix][inning] is False:
+                self.leadoff = True
+                self.not_leadoff[top_ix][inning] = True
+        except IndexError:
+            # This is an extra-inning leadoff
+            self.leadoff = True
+            self.not_leadoff[top_ix] += [True]
+
+        # Update leadoff
+        try:
+            self.not_leadoff[top_ix][inning] = True
+        except IndexError:
+            raise GameParsingError()
+
     def update_runner_count(self, event):
         # If top of inning, reset baserunner count
-        if event['is_leadoff']:
+        if self.leadoff:
             self.n_baserunners = 0
 
         # If batter gets 1-3 bases, we have 1 more baserunner
@@ -315,28 +341,12 @@ class EventParser(object):
         inning = event['inning']
         top = event['top_of_inning']
         top_ix = 0 if top else 1
-        leadoff = event['is_leadoff']
-
-        # Can't trust the leadoff boolean... Some games are off
-        try:
-            if self.not_leadoff[top_ix][inning] is False:
-                leadoff = True
-                self.not_leadoff[top_ix][inning] = True
-        except IndexError:
-            # This is an extra-inning leadoff
-            leadoff = True
-            self.not_leadoff[top_ix] += [True]
+        leadoff = self.leadoff
 
         if inning>=9 and top and leadoff:
             # We just started an extra inning, so extend the line score
             self.line_score['home'] = self.line_score['home'] + [0]
             self.line_score['away'] = self.line_score['away'] + [0]
-
-        # Update leadoff
-        try:
-            self.not_leadoff[top_ix][inning] = True
-        except IndexError:
-            raise GameParsingError()
 
         # Update line score with new runs
         rbi = False
