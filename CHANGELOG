@@ -1,3 +1,7 @@
+# v0.6
+
+* record inning-by-inning strikeout, walk, hbp, and hit info
+
 # v0.5
 
 * adding additional logic to handle events that are RBIs but not labeled as such
