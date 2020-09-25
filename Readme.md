@@ -61,15 +61,16 @@ $ game-finder --season 4 --day 20 --team Sunbeams | xargs game-summary
         "away": [ 6, 12, 0 ]
     },
     "line_score": {
-        "home": [ 0, 1, 0, 3, 0, 0, 0, 0, 0 ],
-        "away": [ 0, 0, 0, 1, 3, 0, 0, 0, 2 ] },
+        "home": [ 0, 0, 1, 0, 3, 0, 0, 0, 0, 0 ],
+        "away": [ 0, 0, 0, 0, 1, 3, 0, 0, 0, 2 ]
+    },
     "pitching_summary": {
-        "WP-K": 3,
-        "WP-BB": 1,
-        "WP-HBP": 0,
-        "LP-K": 8,
-        "LP-BB": 0,
-        "LP-HBP": 0,
+        "WP-K": [ 1, 0, 0, 1, 0, 0, 0, 0, 1, 0 ],
+        "WP-BB": [ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 ],
+        "WP-HBP": [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+        "LP-K": [ 1, 0, 1, 0, 1, 1, 0, 2, 2, 0 ],
+        "LP-BB": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+        "LP-HBP": [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
         "WP": "Miguel James",
         "LP": "Silvia Rugrat"
     },
@@ -80,6 +81,7 @@ $ game-finder --season 4 --day 20 --team Sunbeams | xargs game-summary
                 "TP": 0
             },
             "batting": {
+                "H": [ 0, 0, 2, 1, 3, 0, 1, 0, 1, 1 ],
                 "1B": {
                     "Jos\u00e9 Haley": 2,
                     "Yong Wright": 1,
@@ -105,7 +107,8 @@ $ game-finder --season 4 --day 20 --team Sunbeams | xargs game-summary
                 "SAC": {},
                 "GDP": {},
                 "GTP": {},
-                "LOB": 6
+                "LOB": 6,
+                "RBI": 4
             },
             "baserunning": {
                 "SB": {},
@@ -118,6 +121,7 @@ $ game-finder --season 4 --day 20 --team Sunbeams | xargs game-summary
                 "TP": 0
             },
             "batting": {
+                "H": [ 1, 1, 1, 0, 1, 4, 0, 1, 1, 2 ],
                 "1B": {
                     "Alaynabella Hollywood": 3,
                     "Alexander Horne": 1,
@@ -148,7 +152,8 @@ $ game-finder --season 4 --day 20 --team Sunbeams | xargs game-summary
                 "SAC": {},
                 "GDP": {},
                 "GTP": {},
-                "LOB": 6
+                "LOB": 6,
+                "RBI": 6
             },
             "baserunning": {
                 "SB": {},
