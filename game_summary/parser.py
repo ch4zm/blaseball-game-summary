@@ -192,6 +192,7 @@ class EventParser(object):
                     'TP': 0
                 },
                 'batting': {
+                    'H': [0,]*9,
                     '1B': {},
                     '2B': {},
                     '3B': {},
@@ -343,8 +344,8 @@ class EventParser(object):
         top_ix = 0 if top else 1
         leadoff = self.leadoff
 
+        # Extend inning-by-inning list if extra innings
         if inning>=9 and top and leadoff:
-            # We just started an extra inning, so extend the line score
             self.line_score['home'] = self.line_score['home'] + [0]
             self.line_score['away'] = self.line_score['away'] + [0]
 
@@ -393,6 +394,14 @@ class EventParser(object):
         else:
             label = 'home'
 
+        # Extend inning-by-inning list if extra innings
+        inning = event['inning']
+        top = event['top_of_inning']
+        leadoff = self.leadoff
+        if inning>=9 and top and leadoff:
+            for ha in ['home', 'away']:
+                self.game_summary[ha][catkey]['H'] += [0]
+
         # Class for looking up player/team IDs
         e = EntityData()
 
@@ -417,6 +426,11 @@ class EventParser(object):
             else:
                 temp[batter_name] += 1
             self.game_summary[label][catkey][k] = temp
+
+            if event['event_type'] in self.HIT_TYPES:
+                temp = self.game_summary[label][catkey]['H']
+                temp[inning] += 1
+                self.game_summary[label][catkey]['H'] = temp
 
         # Handle GDP and GTP case
         if event['event_type']=='OUT':
@@ -504,6 +518,15 @@ class EventParser(object):
         else:
             label = 'away'
 
+        # Extend inning-by-inning list if extra innings
+        inning = event['inning']
+        top = event['top_of_inning']
+        leadoff = self.leadoff
+        if inning>=9 and top and leadoff:
+            for ha in ['home', 'away']:
+                for stat in ['K', 'BB']:
+                    self.game_summary[ha][catkey][stat] += [0]
+
         # Class for looking up player/team IDs
         e = EntityData()
         event_key_map = {
@@ -513,7 +536,9 @@ class EventParser(object):
         }
         if event['event_type'] in event_key_map:
             k = event_key_map[event['event_type']]
-            self.game_summary[label][catkey][k] += 1
+            temp = self.game_summary[label][catkey][k]
+            temp[inning] += 1
+            self.game_summary[label][catkey][k] = temp
 
     def parse_weather_events(self, event):
         # Check for weather events (?)
