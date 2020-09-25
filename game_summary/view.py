@@ -198,10 +198,15 @@ class TextView(BaseView):
         pitching_summary.append(ps)
         pitching_summary.append("-"*len(ps))
         pitching_summary.append("")
-        for k in ['WP', 'WP-K', 'WP-BB']:
-            pitching_summary.append("%s: %s"%(k, str(d['pitching_summary'][k])))
-        for k in ['LP', 'LP-K', 'LP-BB']:
-            pitching_summary.append("%s: %s"%(k, str(d['pitching_summary'][k])))
+
+        pitching_summary.append("%s: %s"%(k, str(d['pitching_summary']['WP'])))
+        for k in ['WP-K', 'WP-BB']:
+            pitching_summary.append("%s: %s"%(k, str(sum(d['pitching_summary'][k]))))
+
+        pitching_summary.append("%s: %s"%(k, str(d['pitching_summary']['LP'])))
+        for k in ['LP-K', 'LP-BB']:
+            pitching_summary.append("%s: %s"%(k, str(sum(d['pitching_summary'][k]))))
+
         pitching_summary.append("")
 
         return pitching_summary
