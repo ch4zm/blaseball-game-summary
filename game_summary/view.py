@@ -232,7 +232,7 @@ class TextView(BaseView):
 
         # Batting summary
         team_summary.append("Batting:")
-        team_summary.append("RBI: %d"%(summ['batting']['RBI']))
+        team_summary.append("RBI: %d"%(sum(summ['batting']['RBI'].values())))
         for k in ['HR', '3B', '2B', '1B', 'BB', 'K', 'SAC', 'GDP']:
             bmap = summ['batting'][k]
             if len(bmap.items())==0:

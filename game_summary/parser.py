@@ -203,7 +203,7 @@ class EventParser(object):
                     'GDP': {},
                     'GTP': {},
                     'LOB': 0,
-                    'RBI': 0
+                    'RBI': {}
                 },
                 'baserunning': {
                     'SB': {},
@@ -463,8 +463,15 @@ class EventParser(object):
                 rbi = True
         rbi = rbi or event['runs_batted_in'] > 0
         if rbi:
-            self.game_summary[label][catkey]['RBI'] += max(1, event['runs_batted_in'])
-
+            # Look up player name
+            batter_id = event['batter_id']
+            batter_name = e.get_player_name_by_id(batter_id)
+            # Increment this player's RBI count
+            temp = self.game_summary[label][catkey]['RBI']
+            if batter_name not in temp.keys():
+                temp[batter_name] = max(1, event['runs_batted_in'])
+            else:
+                temp[batter_name] += max(1, event['runs_batted_in'])
 
     def parse_game_summary_baserunning(self, event):
         catkey = 'baserunning'
