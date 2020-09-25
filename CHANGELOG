@@ -1,6 +1,7 @@
 # v0.6
 
 * record inning-by-inning strikeout, walk, hbp, and hit info
+* record RBIs by player, instead of aggregating over team
 
 # v0.5
 
