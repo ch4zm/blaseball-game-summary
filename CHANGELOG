@@ -2,6 +2,7 @@
 
 * record inning-by-inning strikeout, walk, hbp, and hit info
 * record RBIs by player, instead of aggregating over team
+* account for teams starting with targeted shame runs (could use some work)
 
 # v0.5
 
