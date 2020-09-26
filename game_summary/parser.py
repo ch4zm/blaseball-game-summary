@@ -15,50 +15,53 @@ info:
 - stadium: _
 - weather: _
 
-boxscore:
+box_score:
 - home: [0, 2, 0]
 - away: [1, 2, 0]
 
-linescore:
+line_score:
 - home: [0,0,0,0,0,0,0,0,0]
 - away: [0,0,0,0,0,0,0,0,1]
 
-gameSummary:
-- fielding:
-  - DP: int
-  - TP: int
-- batting:
-  - H: [0, 0, 0, 0, 0, 0, 0, 0, 0]
-  - 1B:
-    - player_name: count
-  - 2B:
-    - player_name: count
-  - 3B
-    - player_name: count
-  - HR
-    - player_name: count
-  - BB
-    - player_name: count
-  - K
-    - player_name: count
-  - SAC
-    - player_name: count
-  - GDP
-    - player_name: count
-  - LOB: int
-  - RBI: int
-- baserunning:
-  - SB
-    - player_name: count
-  - CS
-    - player_name: count
-- pitching
-  - WP: _
-  - WP-K: [0, 0, 0, 0, 0, 0, 0, 0, 0]
-  - WP-BB: [0, 0, 0, 0, 0, 0, 0, 0, 0]
-  - LP: _
-  - LP-K: [0, 0, 0, 0, 0, 0, 0, 0, 0]
-  - LP-BB: [0, 0, 0, 0, 0, 0, 0, 0, 0]
+game_summary:
+- home/away:
+  - fielding:
+    - DP: int
+    - TP: int
+  - batting:
+    - H: [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    - 1B:
+      - player_name: count
+    - 2B:
+      - player_name: count
+    - 3B
+      - player_name: count
+    - HR
+      - player_name: count
+    - GS
+      - player_name: count
+    - BB
+      - player_name: count
+    - K
+      - player_name: count
+    - SAC
+      - player_name: count
+    - GDP
+      - player_name: count
+    - LOB: int
+    - RBI: int
+  - baserunning:
+    - SB
+      - player_name: count
+    - CS
+      - player_name: count
+  - pitching
+    - WP: _
+    - WP-K: [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    - WP-BB: [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    - LP: _
+    - LP-K: [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    - LP-BB: [0, 0, 0, 0, 0, 0, 0, 0, 0]
 - weatherEvents:
   - "X was incinerated"
   - "The blooddrain gurgled"
@@ -98,6 +101,8 @@ class EventParser(object):
     n_baserunners = 0
     # Keep track of who won (to translate home/away to winner/loser)
     who_won = None
+    # Keep track of shame runs
+    shame_runs_set = False
 
     def __init__(self, raw_game_data):
         # Store the raw game data JSON from blaseball.com
@@ -197,6 +202,7 @@ class EventParser(object):
                     '2B': {},
                     '3B': {},
                     'HR': {},
+                    'GS': {},
                     'K': {},
                     'BB': {},
                     'SAC': {},
@@ -221,6 +227,7 @@ class EventParser(object):
 
     def parse(self, event):
         self.update_leadoff(event)
+        self.update_shameruns(event)
         self.update_runner_count(event)
         self.parse_box_score(event)
         self.parse_line_score(event)
@@ -286,6 +293,21 @@ class EventParser(object):
             self.not_leadoff[top_ix][inning] = True
         except IndexError:
             raise GameParsingError()
+
+    def update_shameruns(self, event):
+        # The targeted shame runs don't show up until the second batter usually
+        if event['inning']<1 and not self.leadoff and not self.shame_runs_set:
+            if event['top_of_inning']:
+                if event['away_score']<0:
+                    temp = self.box_score['away']
+                    temp[0] = event['away_score']
+                    self.box_score['away'] = temp
+            else:
+                if event['home_score']<0:
+                    temp = self.box_score['home']
+                    temp[0] = event['away_score']
+                    self.box_score['home'] = temp
+            self.shame_runs_set = True
 
     def update_runner_count(self, event):
         # If top of inning, reset baserunner count
@@ -415,10 +437,19 @@ class EventParser(object):
             'SACRIFICE': 'SAC'
         }
         if event['event_type'] in event_key_map:
+
             k = event_key_map[event['event_type']]
+
             # Look up player name
             batter_id = event['batter_id']
             batter_name = e.get_player_name_by_id(batter_id)
+
+            # Handle the grand slam case
+            rbi = event['runs_batted_in']
+            if rbi==4:
+                # GS not HR
+                k = 'GS'
+
             # Increment this batter's count
             temp = self.game_summary[label][catkey][k]
             if batter_name not in temp.keys():
@@ -427,6 +458,7 @@ class EventParser(object):
                 temp[batter_name] += 1
             self.game_summary[label][catkey][k] = temp
 
+            # Increment hits
             if event['event_type'] in self.HIT_TYPES:
                 temp = self.game_summary[label][catkey]['H']
                 temp[inning] += 1
@@ -435,6 +467,7 @@ class EventParser(object):
         # Handle GDP and GTP case
         if event['event_type']=='OUT':
             if event['is_double_play'] or event['is_triple_play']:
+
                 # Look up player name
                 batter_id = event['batter_id']
                 batter_name = e.get_player_name_by_id(batter_id)
@@ -442,6 +475,7 @@ class EventParser(object):
                     k = 'GDP'
                 else:
                     k = 'GTP'
+
                 # Increment this batter's GDP/GTP count
                 temp = self.game_summary[label][catkey][k]
                 if batter_name not in temp.keys():
@@ -463,9 +497,11 @@ class EventParser(object):
                 rbi = True
         rbi = rbi or event['runs_batted_in'] > 0
         if rbi:
+
             # Look up player name
             batter_id = event['batter_id']
             batter_name = e.get_player_name_by_id(batter_id)
+
             # Increment this player's RBI count
             temp = self.game_summary[label][catkey]['RBI']
             if batter_name not in temp.keys():

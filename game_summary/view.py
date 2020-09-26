@@ -199,11 +199,11 @@ class TextView(BaseView):
         pitching_summary.append("-"*len(ps))
         pitching_summary.append("")
 
-        pitching_summary.append("%s: %s"%(k, str(d['pitching_summary']['WP'])))
+        pitching_summary.append("WP: %s"%(str(d['pitching_summary']['WP'])))
         for k in ['WP-K', 'WP-BB']:
             pitching_summary.append("%s: %s"%(k, str(sum(d['pitching_summary'][k]))))
 
-        pitching_summary.append("%s: %s"%(k, str(d['pitching_summary']['LP'])))
+        pitching_summary.append("LP: %s"%(str(d['pitching_summary']['LP'])))
         for k in ['LP-K', 'LP-BB']:
             pitching_summary.append("%s: %s"%(k, str(sum(d['pitching_summary'][k]))))
 
@@ -233,7 +233,7 @@ class TextView(BaseView):
         # Batting summary
         team_summary.append("Batting:")
         team_summary.append("RBI: %d"%(sum(summ['batting']['RBI'].values())))
-        for k in ['HR', '3B', '2B', '1B', 'BB', 'K', 'SAC', 'GDP']:
+        for k in ['GS', 'HR', '3B', '2B', '1B', 'BB', 'K', 'SAC', 'GDP']:
             bmap = summ['batting'][k]
             if len(bmap.items())==0:
                 continue
@@ -244,8 +244,10 @@ class TextView(BaseView):
             # Assemble BatterName (count) list
             to_add = []
             for player, value in newbmap.items():
+                # Ignore singles, Ks, or BBs unless 2 or more
                 if (k=='1B' or k=='K' or k=='BB') and value<2:
                     continue
+                # Format as Batter Name (n)
                 to_add.append("%s (%d)"%(player, value))
             if len(to_add)>0:
                 # Make it pretty and print
