@@ -2,8 +2,9 @@
 
 * record inning-by-inning strikeout, walk, hbp, and hit info
 * record RBIs by player, instead of aggregating over team
-* fix version flag
 * account for teams starting with targeted shame runs (could use some work)
+* fix version flag
+* add Python API to allow calling from Python in addition to command line
 
 # v0.5
 
