@@ -2,6 +2,7 @@ import sys
 import os
 import json
 import configargparse
+from .util import CaptureStdout
 from .view import MarkdownView, TextView, RichView, JsonView
 
 
@@ -99,6 +100,12 @@ def main(sysargs = sys.argv[1:]):
     elif options.json:
         v = JsonView(options)
         v.show()
+
+
+def game_summary(sysargs):
+    with CaptureStdout() as so:
+        main(sysargs)
+    return str(so)
 
 
 if __name__ == '__main__':
