@@ -458,6 +458,15 @@ class EventParser(object):
                 temp[batter_name] += 1
             self.game_summary[label][catkey][k] = temp
 
+            # If this is a GS, increment HR too
+            if k=='GS':
+                temp = self.game_summary[label][catkey]['HR']
+                if batter_name not in temp.keys():
+                    temp[batter_name] = 1
+                else:
+                    temp[batter_name] += 1
+                self.game_summary[label][catkey]['HR'] = temp
+
             # Increment hits
             if event['event_type'] in self.HIT_TYPES:
                 temp = self.game_summary[label][catkey]['H']
