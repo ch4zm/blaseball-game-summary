@@ -61,20 +61,23 @@ def main(sysargs = sys.argv[1:]):
 
     # -----
 
-    # Print help, if no arguments provided
     if len(sysargs)==0:
+        # Print help, if no arguments provided
         p.print_help()
         exit(0)
-
-    # Parse arguments
-    options = p.parse_args(sysargs)
-
-    # If the user asked for the version,
-    # print the version number and exit.
-    if options.version:
+    elif '-v' in sysargs or '--version' in sysargs:
+        # If the user asked for the version,
+        # print the version number and exit.
+        # (Note: this is done separate from
+        # argparse, because otherwise the user
+        # has to ALSO provide a game ID to get
+        # the --version flag to work. ugh.)
         from . import _program, __version__
         print(_program, __version__)
         sys.exit(0)
+
+    # Parse arguments
+    options = p.parse_args(sysargs)
 
     # If the user did not specify output format, use text
     if (not options.markdown) and (not options.text) and (not options.rich) and (not options.json):
