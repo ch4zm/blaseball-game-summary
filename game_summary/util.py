@@ -91,8 +91,7 @@ def sanitize_dale(s):
 class CaptureStdout(object):
     """
     A utility object that uses a context manager
-    to capture stdout from Snakemake. Useful when
-    creating the directed acyclic graph.
+    to capture stdout.
     """
     def __init__(self):
         # Boolean: should we pass everything through to stdout?

@@ -8,6 +8,7 @@ from .util import get_stadium, TieGameException, GameParsingError
 Sample game summary json structure:
 
 info:
+- id: _
 - season: _
 - day: _
 - homeTeamNickname: _
@@ -146,6 +147,7 @@ class EventParser(object):
             # Not dealing with this right now, only 6 games whose data was lost anyway?
             raise TieGameException()
         self.game_summary_data['info'] = dict(
+            id = self.game_data.game['id'],
             season = self.game_data.game['season']+1,
             day = self.game_data.game['day']+1,
             homeTeamNickname = self.game_data.game['homeTeamNickname'],

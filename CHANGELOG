@@ -5,6 +5,7 @@
 * account for teams starting with targeted shame runs (could use some work)
 * fix version flag
 * add Python API to allow calling from Python in addition to command line
+* add game ID to game info section in JSON that is output
 
 # v0.5
 
