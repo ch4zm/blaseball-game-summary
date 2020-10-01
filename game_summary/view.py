@@ -34,7 +34,7 @@ class BaseView(object):
         self.box_only = options.box_only
         self.line_only = options.line_only
         try:
-            gsd = GameSummaryData(self.game_id)
+            gsd = GameSummaryData(self.game_id, options)
             self.json_game_data = gsd.get_json()
         except NoMatchingGames as e:
             print(f"No matching games found for game id {self.game_id}. Try using blaseball-game-finder to look for game IDs.")
@@ -116,9 +116,11 @@ class TextView(BaseView):
         info_header = []
         info_header.append("Game ID: %s"%(self.game_id))
         info_header.append("Season %d Day %d:"%(d['info']['season'], d['info']['day']))
-        info_header.append("%s @ %s"%(
+        info_header.append("%s (%d%%) @ %s (%d%%)"%(
             d['info']['awayTeamName'],
+            round(100*d['info']['awayOdds']),
             d['info']['homeTeamName'],
+            round(100*d['info']['homeOdds']),
         ))
         info_header.append(d['info']['stadium'])
         info_header.append("Weather: %s"%(d['info']['weather']))

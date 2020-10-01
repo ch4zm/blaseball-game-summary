@@ -29,11 +29,11 @@ class GameSummaryData(object):
     it can then generate a game summary JSON.
 
     """
-    def __init__(self, game_id):
+    def __init__(self, game_id, options):
         # fetch raw game data
         raw = RawEventData(game_id)
         game = RawGameData(game_id)
-        self.parser = EventParser(game)
+        self.parser = EventParser(game, options)
         for i, event in enumerate(raw.events()):
             self.parser.parse(event)
         self.parser.finalize()

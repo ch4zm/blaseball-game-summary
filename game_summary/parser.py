@@ -13,6 +13,8 @@ info:
 - day: _
 - homeTeamNickname: _
 - awayTeamNickname:
+- homeOdds: _
+- awayOdds:
 - stadium: _
 - weather: _
 
@@ -105,7 +107,7 @@ class EventParser(object):
     # Keep track of shame runs
     shame_runs_set = False
 
-    def __init__(self, raw_game_data):
+    def __init__(self, raw_game_data, options):
         # Store the raw game data JSON from blaseball.com
         self.game_data = raw_game_data
 
@@ -113,10 +115,18 @@ class EventParser(object):
         self.populate_game_info()
 
         # Prepare data structures for parsing
-        self.init_box_score()
-        self.init_line_score()
-        self.init_game_summary()
-        self.init_weather_events()
+        self.box_only = options.box_only
+        self.line_only = options.line_only
+        if self.box_only:
+            self.init_box_score()
+        elif self.line_only:
+            self.init_box_score()
+            self.init_line_score()
+        else:
+            self.init_box_score()
+            self.init_line_score()
+            self.init_game_summary()
+            self.init_weather_events()
 
         # Have we seen any events in this half-inning yet
         self.not_leadoff = [[False,]*9, [False]*9]
@@ -154,6 +164,8 @@ class EventParser(object):
             awayTeamNickname = self.game_data.game['awayTeamNickname'],
             homeTeamName = self.game_data.game['homeTeamName'],
             awayTeamName = self.game_data.game['awayTeamName'],
+            homeOdds = self.game_data.game['homeOdds'],
+            awayOdds = self.game_data.game['awayOdds'],
             stadium = get_stadium(self.game_data.game['homeTeamNickname']),
             weather = self.WEATHER[str(self.game_data.game['weather'])]
         )
@@ -231,18 +243,30 @@ class EventParser(object):
         self.update_leadoff(event)
         self.update_shameruns(event)
         self.update_runner_count(event)
-        self.parse_box_score(event)
-        self.parse_line_score(event)
-        self.parse_game_summary(event)
-        self.parse_weather_events(event)
+
+        if self.box_only:
+            self.parse_box_score(event)
+        elif self.line_only:
+            self.parse_box_score(event)
+            self.parse_line_score(event)
+        else:
+            self.parse_box_score(event)
+            self.parse_line_score(event)
+            self.parse_game_summary(event)
+            self.parse_weather_events(event)
 
     def finalize(self):
-        self.game_summary_data['box_score'] = self.box_score
-        self.game_summary_data['line_score'] = self.line_score
-        self.finalize_game_summary_pitching()
-        self.game_summary_data['pitching_summary'] = self.pitching_summary
-        self.game_summary_data['game_summary'] = self.game_summary
-        self.game_summary_data['weather_events'] = self.weather_events
+        if self.box_only:
+            self.game_summary_data['box_score'] = self.box_score
+        elif self.line_only:
+            self.game_summary_data['line_score'] = self.line_score
+        else:
+            self.game_summary_data['box_score'] = self.box_score
+            self.game_summary_data['line_score'] = self.line_score
+            self.finalize_game_summary_pitching()
+            self.game_summary_data['pitching_summary'] = self.pitching_summary
+            self.game_summary_data['game_summary'] = self.game_summary
+            self.game_summary_data['weather_events'] = self.weather_events
 
     def finalize_game_summary_pitching(self):
         # Remove pitching from game_summary and make it its own section

@@ -6,6 +6,7 @@
 * fix version flag
 * add Python API to allow calling from Python in addition to command line
 * add game ID to game info section in JSON that is output
+* add team odds to game info
 
 # v0.5
 

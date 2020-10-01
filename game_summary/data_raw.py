@@ -79,11 +79,13 @@ class RawGameData(object):
         awayTeamEmoji
         awayPitcherName
         awayScore
+        awayOdds
         homeTeamName
         homeTeamNickname
         homeTeamEmoji
         homePitcherName
         homeScore
+        homeOdds
         season
         day
         isPostseason
