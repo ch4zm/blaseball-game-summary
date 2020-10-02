@@ -1,3 +1,7 @@
+# v0.7
+
+* pin blaseball-core-game-data version
+
 # v0.6
 
 * record inning-by-inning strikeout, walk, hbp, and hit info
