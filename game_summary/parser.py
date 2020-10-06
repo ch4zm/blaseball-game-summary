@@ -468,27 +468,28 @@ class EventParser(object):
 
             # Look up player name
             batter_id = event['batter_id']
-            batter_name = e.get_player_name_by_id(batter_id)
+            if batter_id!="UNNOWN":
+                batter_name = e.get_player_name_by_id(batter_id)
 
-            # Handle the grand slam case
-            rbi = event['runs_batted_in']
-            if rbi==4:
-                # GS not HR
-                k = 'GS'
+                # Handle the grand slam case
+                rbi = event['runs_batted_in']
+                if rbi==4:
+                    # GS not HR
+                    k = 'GS'
 
-            # Increment this batter's count
-            temp = self.game_summary[label][catkey][k]
-            if batter_name not in temp.keys():
-                temp[batter_name] = 1
-            else:
-                temp[batter_name] += 1
-            self.game_summary[label][catkey][k] = temp
+                # Increment this batter's count
+                temp = self.game_summary[label][catkey][k]
+                if batter_name not in temp.keys():
+                    temp[batter_name] = 1
+                else:
+                    temp[batter_name] += 1
+                self.game_summary[label][catkey][k] = temp
 
-            # Increment hits
-            if event['event_type'] in self.HIT_TYPES:
-                temp = self.game_summary[label][catkey]['H']
-                temp[inning] += 1
-                self.game_summary[label][catkey]['H'] = temp
+                # Increment hits
+                if event['event_type'] in self.HIT_TYPES:
+                    temp = self.game_summary[label][catkey]['H']
+                    temp[inning] += 1
+                    self.game_summary[label][catkey]['H'] = temp
 
         # Handle GDP and GTP case
         if event['event_type']=='OUT':
@@ -496,19 +497,20 @@ class EventParser(object):
 
                 # Look up player name
                 batter_id = event['batter_id']
-                batter_name = e.get_player_name_by_id(batter_id)
-                if event['is_double_play']:
-                    k = 'GDP'
-                else:
-                    k = 'GTP'
+                if batter_id!="UNNOWN":
+                    batter_name = e.get_player_name_by_id(batter_id)
+                    if event['is_double_play']:
+                        k = 'GDP'
+                    else:
+                        k = 'GTP'
 
-                # Increment this batter's GDP/GTP count
-                temp = self.game_summary[label][catkey][k]
-                if batter_name not in temp.keys():
-                    temp[batter_name] = 1
-                else:
-                    temp[batter_name] += 1
-                self.game_summary[label][catkey][k] = temp
+                    # Increment this batter's GDP/GTP count
+                    temp = self.game_summary[label][catkey][k]
+                    if batter_name not in temp.keys():
+                        temp[batter_name] = 1
+                    else:
+                        temp[batter_name] += 1
+                    self.game_summary[label][catkey][k] = temp
 
         # If this is the third out, tabulate LOB
         if self._is_third_out(event):
@@ -526,14 +528,15 @@ class EventParser(object):
 
             # Look up player name
             batter_id = event['batter_id']
-            batter_name = e.get_player_name_by_id(batter_id)
+            if batter_id!="UNNOWN":
+                batter_name = e.get_player_name_by_id(batter_id)
 
-            # Increment this player's RBI count
-            temp = self.game_summary[label][catkey]['RBI']
-            if batter_name not in temp.keys():
-                temp[batter_name] = max(1, event['runs_batted_in'])
-            else:
-                temp[batter_name] += max(1, event['runs_batted_in'])
+                # Increment this player's RBI count
+                temp = self.game_summary[label][catkey]['RBI']
+                if batter_name not in temp.keys():
+                    temp[batter_name] = max(1, event['runs_batted_in'])
+                else:
+                    temp[batter_name] += max(1, event['runs_batted_in'])
 
     def parse_game_summary_baserunning(self, event):
         catkey = 'baserunning'
