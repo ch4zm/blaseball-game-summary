@@ -401,7 +401,7 @@ Weather: Solar Eclipse
 ### pip
 
 ```
-pip install blaseball-game-summary
+pip install git+https://github.com/ch4zm/blaseball-game-summary.git#egg=game_summary
 ```
 
 ### source
