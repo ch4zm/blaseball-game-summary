@@ -15,15 +15,100 @@ to make the game summary tables.
 
 ## Table of Contents
 
-* [Example Output](#example-output)
 * [Installation](#installation)
     * [pip](#pip)
     * [source](#source)
 * [Quick Start](#quick-start)
     * [Command line flags](#command-line-flags)
+* [Example Output](#example-output)
 * [Data](#data)
 * [Future work](#future-work)
 * [Libraries used](#libraries-used)
+
+## Installation
+
+### pip
+
+```
+pip install git+https://github.com/ch4zm/blaseball-core-game-data.git#egg=blaseball_core_game_data
+pip install git+https://github.com/ch4zm/blaseball-game-summary.git#egg=blaseball_game_summary
+```
+
+### source
+
+Start by cloning the package:
+
+```
+git clone https://github.com/ch4zm/blaseball-game-summary
+cd blaseball-game-summary
+```
+
+If installing from source, it is recommended you install the package
+into a virtual environment. For example:
+
+```
+virtualenv vp
+source vp/bin/activate
+```
+
+Now build and install the package:
+
+```
+python setup.py build
+python setup.py install
+```
+
+Now test that the tool is available on the command line, and try out
+a command to search for some streaks:
+
+```
+which game-summary
+game-summary c8eb9f92-5f9e-444f-9ad4-e679a58a10bd
+```
+
+(this was the game that Randy Marijuana was incinerated from the Jazz Hands.)
+
+## Quick Start
+
+This tool is calling the `/events` API endpoint of the blaseball-reference.com
+API, which returns a list of all events in a given game, and parsing through
+each event to keep track of the box score, line score, pitching, batting, etc.
+
+The tool stores the final game summary information in a JSON structure,
+and each different output option (markdown, rich console text, or plain text)
+utilizes the common JSON data structure.
+
+### Command line flags
+
+Command line flags are grouped into data options and view options.
+
+Basic options:
+
+* **Print version:** `--version` or `-v` flag
+
+Positional arguments:
+
+* **Game ID:** this is the first positional (non-flag) argument. Its value should be the UUID of a game.
+
+View options:
+
+* **Text:** Use the `--text` flag to output game summaries in plain text format
+
+* **Rich:** Use the `--rich` flag to output game summaries in rich text format
+
+* **Markdown:** Use the `--markdown` flag to output game summaries in Markdown format
+
+* **JSON:** (default) Use the `--json` flag to output game summaries in JSON format
+
+* **Box or Line Socre Only:** Add the `--box-only` flag to print the box score only
+  (3-column table with Runs, Hits, and Errors); add the `--line-only` flag to print
+  the line score only (multi-column table with one column per inning, plus the tally
+  of Runs, Hits, and Errors at the end)
+
+Using a configuration file:
+
+* **Config file**: use the `-c` or `--config` file to point to a configuration file (see next section).
+
 
 ## Example Output
 
@@ -394,91 +479,6 @@ Weather: Solar Eclipse
 └──────────────────────────────────────────────────────────────────────────────┘
 
 ```
-
-
-## Installation
-
-### pip
-
-```
-pip install git+https://github.com/ch4zm/blaseball-game-summary.git#egg=game_summary
-```
-
-### source
-
-Start by cloning the package:
-
-```
-git clone https://github.com/ch4zm/blaseball-game-summary
-cd blaseball-game-summary
-```
-
-If installing from source, it is recommended you install the package
-into a virtual environment. For example:
-
-```
-virtualenv vp
-source vp/bin/activate
-```
-
-Now build and install the package:
-
-```
-python setup.py build
-python setup.py install
-```
-
-Now test that the tool is available on the command line, and try out
-a command to search for some streaks:
-
-```
-which game-summary
-game-summary c8eb9f92-5f9e-444f-9ad4-e679a58a10bd
-```
-
-(this was the game that Randy Marijuana was incinerated from the Jazz Hands.)
-
-## Quick Start
-
-This tool is calling the `/events` API endpoint of the blaseball-reference.com
-API, which returns a list of all events in a given game, and parsing through
-each event to keep track of the box score, line score, pitching, batting, etc.
-
-The tool stores the final game summary information in a JSON structure,
-and each different output option (markdown, rich console text, or plain text)
-utilizes the common JSON data structure.
-
-### Command line flags
-
-Command line flags are grouped into data options and view options.
-
-Basic options:
-
-* **Print version:** `--version` or `-v` flag
-
-Positional arguments:
-
-* **Game ID:** this is the first positional (non-flag) argument. Its value should be the UUID of a game.
-
-View options:
-
-* **Text:** Use the `--text` flag to output game summaries in plain text format
-
-* **Rich:** Use the `--rich` flag to output game summaries in rich text format
-
-* **Markdown:** Use the `--markdown` flag to output game summaries in Markdown format
-
-* **JSON:** (default) Use the `--json` flag to output game summaries in JSON format
-
-* **Box or Line Socre Only:** Add the `--box-only` flag to print the box score only
-  (3-column table with Runs, Hits, and Errors); add the `--line-only` flag to print
-  the line score only (multi-column table with one column per inning, plus the tally
-  of Runs, Hits, and Errors at the end)
-
-Using a configuration file:
-
-* **Config file**: use the `-c` or `--config` file to point to a configuration file (see next section).
-
 
 ## Data
 
